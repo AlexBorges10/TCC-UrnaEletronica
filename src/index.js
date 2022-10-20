@@ -10,25 +10,28 @@ app.use('/img', express.static('img'))
 const urnas = [
   {
     candidateId: 9090,
-    nomeCandidato: 'Ronaldo',
-    partyNome: 'Partido RD',
+    candidateName: 'Ronaldo',
+    partyName: 'Partido RD',
     partyId: 90,
-    imageUrl: 'http://localhost:8888/img/Ronaldo.webp'
+    imageUrl: 'http://localhost:8888/img/Ronaldo.webp',
+    contagemVotos: 0
   },
 
   {
     candidateId: 1010,
-    nomeCandidato: 'Zidane',
-    partyNome: 'Partido ZD',
+    candidateName: 'Zidane',
+    partyName: 'Partido ZD',
     partyId: 10,
-    imageUrl: 'http://localhost:8888/img/zidane.jpg'
+    imageUrl: 'http://localhost:8888/img/zidane.jpg',
+    contagemVotos: 0
   },
   {
     candidateId: 1212,
-    nomeCandidato: 'Tite',
-    partyNome: 'Partido TI',
+    candidateName: 'Tite',
+    partyName: 'Partido TI',
     partyId: 12,
-    imageUrl: 'http://localhost:8888/img/tite.jpg'
+    imageUrl: 'http://localhost:8888/img/tite.jpg',
+    contagemVotos: 0
   }
 ]
 
@@ -38,12 +41,10 @@ const registration = []
 app.get('/candidates/:id', (request, response) => {
   const pessoa = request.get('x-bolovo-username')
 
-  console.log(
-    `[Pesquisa de Candidatos] - ${Date()}, ${pessoa}  selecionou o candidato:`
-  )
-
   const { id } = request.params
-
+  console.log(
+    `[Pesquisa de Candidatos] - ${Date()}, ${pessoa}  selecionou o candidato ${id}`
+  )
   const urnaa = urnas.find(urnaa => urnaa.candidateId == id)
 
   if (urnaa == null) {
@@ -62,15 +63,14 @@ app.post('/votes/:candidateId', (request, response) => {
 
   console.log(`[Confirmação de voto] - ${Date()} , ${pessoa} confimou:`)
   const { candidateId } = request.params
-  const { nomeCandidato, partyNome } = request.body
 
   const urnaa = urnas.find(urnaa => urnaa.candidateId == candidateId)
 
   if (urnaa == null) {
     const votacao = {
       candidateId: null,
-      nomeCandidato: null,
-      partyNome: null
+      candidateName: null,
+      partyName: null
     }
     urnas.push(votacao)
     console.log(votacao)
@@ -79,17 +79,21 @@ app.post('/votes/:candidateId', (request, response) => {
     return response.json(votacao)
   } else {
     const votacao = {
-      nomeCandidato: urnaa.nomeCandidato,
-      partyNome: urnaa.partyNome
+      candidateName: urnaa.candidateName,
+      partyName: urnaa.partyName,
+      contagemVotos: urnaa.contagemVotos
     }
     urnas.push(votacao)
     console.log(votacao)
     console.log(
-      `${pessoa}, seu voto foi confirmado no candidato [${urnaa.nomeCandidato}] do [${urnaa.partyNome}] com sucesso.`
+      `${pessoa}, seu voto foi confirmado no candidato [${urnaa.candidateName}] do [${urnaa.partyName}] com sucesso.`
     )
+    console.log(`${urnaa.candidateName} ${urnaa.contagemVotos}`)
+
+    urnaa.contagemVotos++
 
     return response.json({
-      Mensagem: `${pessoa} seu voto foi confirmado no candidato ${urnaa.nomeCandidato}`
+      Msg: `${pessoa} seu voto foi confirmado no candidato ${urnaa.candidateName} do ${urnaa.partyName}`
     })
   }
 })
