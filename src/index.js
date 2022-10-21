@@ -57,11 +57,32 @@ app.get('/candidates/:id', (request, response) => {
   return response.status(200).json(urnaa)
 })
 
+app.post('/users', (request, response) => {
+  const { candidateId, candidateNome, partyNome, partyId, imageUrl } =
+    request.body
+
+  const exists = urnas.some(urnas => urnas.candidateId === candidateId)
+
+  if (exists) {
+    response.status(400).json({ err: 'Candidato existente.' })
+  }
+  const urnaa = {
+    candidateId: candidateId,
+    candidateNome: candidateNome,
+    partyNamee: partyNome,
+    partyId: partyId,
+    imageUrl: imageUrl
+  }
+  urnas.push(urnaa)
+
+  response.status(200).send()
+})
+
 // [Confirmaçao de voto] //
 app.post('/votes/:candidateId', (request, response) => {
   const pessoa = request.get('x-bolovo-username')
 
-  console.log(`[Confirmação de voto] - ${Date()} , ${pessoa} confimou:`)
+  console.log(`[Confirmação de voto] - ${Date()} , ${pessoa} selecionou:`)
   const { candidateId } = request.params
 
   const urnaa = urnas.find(urnaa => urnaa.candidateId == candidateId)
@@ -72,11 +93,10 @@ app.post('/votes/:candidateId', (request, response) => {
       candidateName: null,
       partyName: null
     }
+
     urnas.push(votacao)
     console.log(votacao)
-    console.log(` Confimou Nulo. `)
-
-    return response.json(votacao)
+    console.log(`${pessoa} Confimou Nulo. `)
   } else {
     const votacao = {
       candidateName: urnaa.candidateName,
@@ -88,9 +108,7 @@ app.post('/votes/:candidateId', (request, response) => {
     console.log(
       `${pessoa}, seu voto foi confirmado no candidato [${urnaa.candidateName}] do [${urnaa.partyName}] com sucesso.`
     )
-    console.log(`${urnaa.candidateName} ${urnaa.contagemVotos}`)
-
-    urnaa.contagemVotos++
+    console.log(`${urnaa.candidateName}  ${urnaa.contagemVotos++} votos.`)
 
     return response.json({
       Msg: `${pessoa} seu voto foi confirmado no candidato ${urnaa.candidateName} do ${urnaa.partyName}`
