@@ -78,7 +78,7 @@ app.post('/users', (request, response) => {
   response.status(200).send()
 })
 
-// [Confirmaçao de voto] //
+//  [Confirmaçao de voto] //
 app.post('/votes/:candidateId', (request, response) => {
   const pessoa = request.get('x-bolovo-username')
 
